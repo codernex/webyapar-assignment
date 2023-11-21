@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
+    <title>Users</title>
+  </head>
+  <body>
+    <div
+      id="main"
+      class="d-flex flex-column m-auto justify-content-center w-75 align-items-center"
+    >
+      <div class="d-flex align-items-center">
+        <div>
+          <input
+            class="form-control form-control-md"
+            id="fileInput"
+            accept="image/*"
+            type="file"
+          />
+        </div>
+        <button class="btn btn-primary h-25" id="uploadBtn">Upload</button>
+      </div>
+      <div class="w-lg-25 w-sm-50 mt-5">
+        <img id="originalImage" src="" alt="Original Image" />
+      </div>
+    </div>
+  </body>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+    integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"
+    defer
+  ></script>
+  <script src="./js/image.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+  <script async>
+    window.addEventListener("load", function () {
+      const access_token = localStorage.getItem("access_token");
+
+      if (!access_token) {
+        this.location.href = "/";
+      }
+    });
+    function initAuth() {
+      // Get the URL fragment
+      var urlFragment = window.location.hash.substring(1); // Excludes the '#' symbol
+
+      // Split the fragment into key-value pairs
+      var params = {};
+      urlFragment.split("&").forEach(function (param) {
+        var keyValue = param.split("=");
+        params[keyValue[0]] = keyValue[1];
+      });
+      // Access individual parameters
+      if (params["access_token"]) {
+        localStorage.setItem("access_token", params["access_token"]);
+      }
+      window.history.pushState({}, document.title, "/" + "user.html");
+    }
+    initAuth();
+
+    function fetchUserInformation() {
+      const access_token = localStorage.getItem("access_token");
+
+      fetch("/verify-user", {
+        method: "POST",
+        headers: {
+          authorization: "Bearer " + access_token,
+        },
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.message === "Request failed with status code 401") {
+            localStorage.removeItem("access_token");
+            window.location.href = "/";
+          }
+        });
+    }
+
+    fetchUserInformation();
+  </script>
+</html>
