@@ -51,7 +51,6 @@ function uploadWebPToAPI(webpData) {
         authorization: "Bearer " + access_token,
       },
     })
-    .then((res) => res.json())
     .then((res) => {
       window.location.href = "/images.html";
     });
